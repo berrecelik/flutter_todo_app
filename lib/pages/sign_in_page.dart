@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/pages/sign_up_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'home_page.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -9,18 +12,36 @@ class SignInPage extends StatefulWidget {
   State<SignInPage> createState() => _SignInPageState();
 }
 
-void signIn() async {
-  try {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: "deneme@gmail.com", password: "password123");
-  } catch (e) {
-    print(e);
-  }
-}
-
 class _SignInPageState extends State<SignInPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool circular = false;
+  Future signIn() async {
+    setState(() {
+      circular = true;
+    });
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim());
+      print(userCredential.user!.email);
+      setState(() {
+        circular = false;
+      });
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (builder) => HomePage()),
+          (route) => false);
+    } catch (e) {
+      final snackBar = SnackBar(content: Text(e.toString()));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      setState(() {
+        circular = false;
+      });
+      print(e);
+    }
+  }
 
   @override
   void dispose() {
@@ -96,11 +117,13 @@ class _SignInPageState extends State<SignInPage> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Center(
-                    child: Text(
-                      "Sign in",
-                      style: GoogleFonts.arvo(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
+                    child: circular
+                        ? CircularProgressIndicator()
+                        : Text(
+                            "Sign in",
+                            style: GoogleFonts.arvo(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
                   ),
                 ),
               ),
@@ -111,11 +134,19 @@ class _SignInPageState extends State<SignInPage> {
                 Text("If you don't have an account ",
                     style: GoogleFonts.arvo(
                         fontSize: 18, fontWeight: FontWeight.w600)),
-                Text("Sign Up",
-                    style: GoogleFonts.arvo(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue))
+                InkWell(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (builder) => SignUpPage()),
+                        (route) => false);
+                  },
+                  child: Text("Sign Up",
+                      style: GoogleFonts.arvo(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue)),
+                )
               ],
             ),
             SizedBox(

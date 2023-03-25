@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/pages/home_page.dart';
+import 'package:flutter_todo_app/pages/sign_in_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -27,6 +29,10 @@ class _SignUpPageState extends State<SignUpPage> {
       setState(() {
         circular = false;
       });
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (builder) => HomePage()),
+          (route) => false);
     } catch (e) {
       final snackBar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -45,6 +51,16 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              "SIGN UP",
+              style: GoogleFonts.arvo(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            SizedBox(
+              height: 10,
+            ),
             Icon(Icons.android, size: 100),
             SizedBox(
               height: 20,
@@ -52,7 +68,7 @@ class _SignUpPageState extends State<SignUpPage> {
             Text(
               "Hello There!",
               style:
-                  GoogleFonts.arvo(fontSize: 30, fontWeight: FontWeight.bold),
+                  GoogleFonts.arvo(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(
               height: 20,
@@ -109,7 +125,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         : Text(
                             "Sign up",
                             style: GoogleFonts.arvo(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                                fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),
@@ -121,11 +137,19 @@ class _SignUpPageState extends State<SignUpPage> {
                 Text("You already have an account? ",
                     style: GoogleFonts.arvo(
                         fontSize: 18, fontWeight: FontWeight.w600)),
-                Text("Login",
-                    style: GoogleFonts.arvo(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue))
+                InkWell(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (builder) => SignInPage()),
+                        (route) => false);
+                  },
+                  child: Text("Login",
+                      style: GoogleFonts.arvo(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue)),
+                )
               ],
             )
           ],
