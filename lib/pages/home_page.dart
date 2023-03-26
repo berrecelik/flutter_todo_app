@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/Custom/todo_card.dart';
 import 'package:flutter_todo_app/pages/add_todo.dart';
+import 'package:flutter_todo_app/pages/view_data.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,6 +13,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final Stream<QuerySnapshot> _stream =
+      FirebaseFirestore.instance.collection("ToDo").snapshots();
+  //source of stream
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +45,7 @@ class _HomePageState extends State<HomePage> {
                 child: Text(
                   "Saturday 25",
                   style: GoogleFonts.arvo(
-                      color: Colors.white,
+                      color: Colors.blueAccent,
                       fontSize: 33,
                       fontWeight: FontWeight.w500),
                 ),
@@ -89,47 +95,63 @@ class _HomePageState extends State<HomePage> {
             ),
             label: 'Settings'),
       ]),
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          child: Column(
-            children: [
-              ToDoCard(
-                title: "Wake up!",
-                check: true,
-                iconBgColor: Colors.white,
-                iconColor: Colors.red,
-                iconData: Icons.alarm,
-                time: "10 AM",
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              ToDoCard(
-                title: "Gym!",
-                check: false,
-                iconBgColor: Color(0xff2cc8d9),
-                iconColor: Colors.white,
-                iconData: Icons.run_circle,
-                time: "11 AM",
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              ToDoCard(
-                title: "Buy some food",
-                check: false,
-                iconBgColor: Color(0xfff19733),
-                iconColor: Colors.white,
-                iconData: Icons.local_grocery_store,
-                time: "1 PM",
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: StreamBuilder(
+          stream: _stream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: CircularProgressIndicator());
+            }
+            return ListView.builder(
+                itemCount: snapshot.data?.docs.length,
+                itemBuilder: (context, index) {
+                  IconData iconData;
+                  Color iconColor;
+                  Map<String, dynamic> document =
+                      snapshot.data?.docs[index].data() as Map<String, dynamic>;
+                  switch (document["category"]) {
+                    //accessing category
+                    case "Work":
+                      iconData = Icons.alarm;
+                      iconColor = Colors.teal;
+                      break;
+                    case "Workout":
+                      iconData = Icons.run_circle_outlined;
+                      iconColor = Colors.red;
+                      break;
+                    case "Food":
+                      iconData = Icons.local_grocery_store;
+                      iconColor = Colors.blue;
+                      break;
+                    case "Design":
+                      iconData = Icons.design_services;
+                      iconColor = Colors.green;
+                      break;
+
+                    default:
+                      iconData = Icons.alarm;
+                      iconColor = Colors.red;
+                  }
+                  return InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (builder) => ViewData(
+                                  document: document,
+                                  id: snapshot.data!.docs[index].id)));
+                    },
+                    child: ToDoCard(
+                        title: document["title"] == null
+                            ? "Hey there!"
+                            : document["title"],
+                        iconData: iconData,
+                        iconColor: iconColor,
+                        time: "time",
+                        check: true,
+                        iconBgColor: Colors.white),
+                  );
+                });
+          }),
     );
   }
 }

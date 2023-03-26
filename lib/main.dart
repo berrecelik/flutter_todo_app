@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_todo_app/pages/home_page.dart';
-import 'package:flutter_todo_app/pages/sign_in_page.dart';
 import 'package:flutter_todo_app/pages/sign_up_page.dart';
 
 import 'firebase_options.dart';
@@ -22,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SignInPage(),
+      home: SignUpPage(),
     );
   }
 }

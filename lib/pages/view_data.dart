@@ -1,20 +1,41 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class AddToDoPage extends StatefulWidget {
-  const AddToDoPage({super.key});
+class ViewData extends StatefulWidget {
+  final Map<String, dynamic> document;
+  final String id;
+  const ViewData({
+    Key? key,
+    required this.document,
+    required this.id,
+  }) : super(key: key);
 
   @override
-  State<AddToDoPage> createState() => _AddToDoPageState();
+  State<ViewData> createState() => _ViewDataState();
 }
 
-class _AddToDoPageState extends State<AddToDoPage> {
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  String type = "";
-  String category = "";
+class _ViewDataState extends State<ViewData> {
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late String type;
+  late String category;
+  bool edit = false;
+
+  @override
+  void initState() {
+    super.initState();
+    String title = widget.document["title"] == null
+        ? "Hey there!"
+        : widget.document["title"];
+    _titleController = TextEditingController(text: title);
+    _descriptionController =
+        TextEditingController(text: widget.document["description"]);
+    type = widget.document["task"];
+    category = widget.document["category"];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +55,52 @@ class _AddToDoPageState extends State<AddToDoPage> {
               SizedBox(
                 height: 25,
               ),
-              IconButton(
-                onPressed: () {},
-                icon: Icon(CupertinoIcons.arrow_left),
-                iconSize: 32,
-                color: Colors.white,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(CupertinoIcons.arrow_left),
+                    iconSize: 32,
+                    color: Colors.white,
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          FirebaseFirestore.instance
+                              .collection("ToDo")
+                              .doc(widget.id)
+                              .delete()
+                              .then((value) {
+                            Navigator.pop(context);
+                          });
+                        },
+                        icon: Icon(Icons.delete),
+                        iconSize: 32,
+                        color: Colors.white,
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          FirebaseFirestore.instance
+                              .collection("ToDo")
+                              .doc(widget.id)
+                              .update({
+                            "title": _titleController.text,
+                            "task": type,
+                            "category": category,
+                            "description": _descriptionController.text
+                          });
+                        },
+                        icon: Icon(Icons.edit),
+                        iconSize: 32,
+                        color: edit ? Colors.purple : Colors.white,
+                      ),
+                    ],
+                  ),
+                ],
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -46,7 +108,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Create",
+                      edit ? "Editing" : "View",
                       style: GoogleFonts.arvo(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -57,7 +119,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
                       height: 5,
                     ),
                     Text(
-                      "New To Do",
+                      "Your To Do",
                       style: GoogleFonts.arvo(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
@@ -128,7 +190,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
                     SizedBox(
                       height: 12,
                     ),
-                    button(),
+                    edit ? button() : Container(),
                     SizedBox(
                       height: 30,
                     )
@@ -145,7 +207,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
   Widget button() {
     return InkWell(
       onTap: () {
-        FirebaseFirestore.instance.collection("ToDo").add({
+        FirebaseFirestore.instance.collection("ToDo").doc(widget.id).update({
           "title": _titleController.text,
           "task": type,
           "category": category,
@@ -160,7 +222,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
             borderRadius: BorderRadius.circular(20), color: Colors.white60),
         child: Center(
             child: Text(
-          "Add To Do",
+          "Update To Do",
           style: GoogleFonts.arvo(fontSize: 18),
         )),
       ),
@@ -176,6 +238,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
       child: Padding(
         padding: const EdgeInsets.only(left: 10.0, right: 10),
         child: TextFormField(
+          enabled: edit,
           controller: _descriptionController,
           style: GoogleFonts.arvo(color: Colors.black, fontSize: 17),
           maxLines: null,
@@ -190,11 +253,13 @@ class _AddToDoPageState extends State<AddToDoPage> {
 
   Widget taskSelect(String label, int color) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          type = label;
-        });
-      },
+      onTap: edit
+          ? () {
+              setState(() {
+                type = label;
+              });
+            }
+          : null,
       child: Chip(
         backgroundColor: type == label ? Colors.black : Color(color),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -212,11 +277,13 @@ class _AddToDoPageState extends State<AddToDoPage> {
 
   Widget categorySelect(String label, int color) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          category = label;
-        });
-      },
+      onTap: edit
+          ? () {
+              setState(() {
+                category = label;
+              });
+            }
+          : null,
       child: Chip(
         backgroundColor: category == label ? Colors.black : Color(color),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -242,6 +309,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
         padding: const EdgeInsets.only(left: 10.0, right: 10),
         child: TextFormField(
           controller: _titleController,
+          enabled: edit,
           style: GoogleFonts.arvo(color: Colors.black, fontSize: 17),
           decoration: InputDecoration(
               border: InputBorder.none,
