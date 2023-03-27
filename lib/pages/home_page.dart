@@ -1,9 +1,13 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_todo_app/pages/profile_page.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import 'package:flutter_todo_app/Custom/todo_card.dart';
 import 'package:flutter_todo_app/pages/add_todo.dart';
 import 'package:flutter_todo_app/pages/view_data.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,16 +20,22 @@ class _HomePageState extends State<HomePage> {
   final Stream<QuerySnapshot> _stream =
       FirebaseFirestore.instance.collection("ToDo").snapshots();
   //source of stream
+  List<Select> selected = [];
 
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('EEE d MMM').format(now);
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text(
-          "Today's Schedule",
-          style: GoogleFonts.arvo(
-              color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
+        title: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: Text(
+            "Today's Schedule",
+            style: GoogleFonts.arvo(
+                color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
+          ),
         ),
         backgroundColor: Colors.black,
         actions: [
@@ -43,7 +53,7 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 20.0),
                 child: Text(
-                  "Saturday 25",
+                  formattedDate,
                   style: GoogleFonts.arvo(
                       color: Colors.blueAccent,
                       fontSize: 33,
@@ -55,10 +65,16 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar:
           BottomNavigationBar(backgroundColor: Colors.black, items: [
         BottomNavigationBarItem(
-          icon: Icon(
-            Icons.home,
-            size: 25,
-            color: Colors.white,
+          icon: InkWell(
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (builder) => Profile()));
+            },
+            child: Icon(
+              Icons.home,
+              size: 25,
+              color: Colors.white,
+            ),
           ),
           label: 'Home',
         ),
@@ -131,6 +147,8 @@ class _HomePageState extends State<HomePage> {
                       iconData = Icons.alarm;
                       iconColor = Colors.red;
                   }
+                  selected.add(Select(
+                      id: snapshot.data!.docs[index].id, checkValue: false));
                   return InkWell(
                     onTap: () {
                       Navigator.push(
@@ -141,17 +159,37 @@ class _HomePageState extends State<HomePage> {
                                   id: snapshot.data!.docs[index].id)));
                     },
                     child: ToDoCard(
-                        title: document["title"] == null
-                            ? "Hey there!"
-                            : document["title"],
-                        iconData: iconData,
-                        iconColor: iconColor,
-                        time: "time",
-                        check: true,
-                        iconBgColor: Colors.white),
+                      title: document["title"] == null
+                          ? "Hey there!"
+                          : document["title"],
+                      iconData: iconData,
+                      iconColor: iconColor,
+                      time: document["time"] == null
+                          ? "Time!!"
+                          : document["time"],
+                      check: selected[index].checkValue,
+                      iconBgColor: Colors.white,
+                      index: index,
+                      onChange: onChange,
+                    ),
                   );
                 });
           }),
     );
   }
+
+  void onChange(int index) {
+    setState(() {
+      selected[index].checkValue = !selected[index].checkValue;
+    });
+  }
+}
+
+class Select {
+  String id;
+  bool checkValue = false;
+  Select({
+    required this.id,
+    required this.checkValue,
+  });
 }

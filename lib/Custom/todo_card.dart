@@ -11,14 +11,18 @@ class ToDoCard extends StatelessWidget {
     required this.time,
     required this.check,
     required this.iconBgColor,
+    required this.onChange,
+    required this.index,
   }) : super(key: key);
 
   final String title;
   final IconData iconData;
   final Color iconColor;
-  final String time;
   final bool check;
   final Color iconBgColor;
+  final Function onChange;
+  final int index;
+  final String time;
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +31,18 @@ class ToDoCard extends StatelessWidget {
       child: Row(
         children: [
           Theme(
-            child: Checkbox(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
-                activeColor: Colors.blue,
-                checkColor: Colors.green,
-                value: check,
-                onChanged: (bool? value) {}),
+            child: Transform.scale(
+              scale: 1.5,
+              child: Checkbox(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  activeColor: Colors.blue,
+                  checkColor: Colors.green,
+                  value: check,
+                  onChanged: (bool? check) {
+                    onChange(index);
+                  }),
+            ),
             data: ThemeData(
               primaryColor: Colors.blue,
               unselectedWidgetColor: Color(0xff5e616a),

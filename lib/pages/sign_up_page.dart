@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_app/pages/home_page.dart';
@@ -14,6 +15,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _nameController = TextEditingController();
   bool circular = false;
 
   Future signUp() async {
@@ -40,6 +42,16 @@ class _SignUpPageState extends State<SignUpPage> {
         circular = false;
       });
     }
+    addUserDetails(_nameController.text.trim(), _emailController.text.trim(),
+        _passwordController.text.trim());
+  }
+
+  Future addUserDetails(String name, String email, String password) async {
+    await FirebaseFirestore.instance.collection('users').add({
+      'name': name,
+      'email': email,
+      'password': password,
+    });
   }
 
   @override
@@ -59,16 +71,52 @@ class _SignUpPageState extends State<SignUpPage> {
                   color: Colors.black),
             ),
             SizedBox(
-              height: 10,
+              height: 15,
             ),
-            Icon(Icons.android, size: 100),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "TO DO APP",
+                  style: GoogleFonts.arvo(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple[800]),
+                ),
+                Icon(Icons.edit_attributes_outlined,
+                    color: Colors.purple[800], size: 50),
+              ],
+            ),
             SizedBox(
-              height: 20,
+              height: 5,
+            ),
+            Icon(Icons.android, size: 80),
+            SizedBox(
+              height: 5,
             ),
             Text(
               "Hello There!",
               style:
                   GoogleFonts.arvo(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(15)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.deepPurple)),
+                    hintText: "Name",
+                    fillColor: Colors.grey[200],
+                    filled: true),
+              ),
             ),
             SizedBox(
               height: 20,

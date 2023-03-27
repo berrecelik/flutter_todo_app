@@ -20,6 +20,7 @@ class ViewData extends StatefulWidget {
 class _ViewDataState extends State<ViewData> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
+  late TextEditingController _timeController;
   late String type;
   late String category;
   bool edit = false;
@@ -33,6 +34,7 @@ class _ViewDataState extends State<ViewData> {
     _titleController = TextEditingController(text: title);
     _descriptionController =
         TextEditingController(text: widget.document["description"]);
+    _timeController = TextEditingController(text: widget.document["time"]);
     type = widget.document["task"];
     category = widget.document["category"];
   }
@@ -84,14 +86,8 @@ class _ViewDataState extends State<ViewData> {
                       ),
                       IconButton(
                         onPressed: () {
-                          FirebaseFirestore.instance
-                              .collection("ToDo")
-                              .doc(widget.id)
-                              .update({
-                            "title": _titleController.text,
-                            "task": type,
-                            "category": category,
-                            "description": _descriptionController.text
+                          setState(() {
+                            edit = !edit;
                           });
                         },
                         icon: Icon(Icons.edit),
@@ -190,6 +186,14 @@ class _ViewDataState extends State<ViewData> {
                     SizedBox(
                       height: 12,
                     ),
+                    label("Time"),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    time(),
+                    SizedBox(
+                      height: 12,
+                    ),
                     edit ? button() : Container(),
                     SizedBox(
                       height: 30,
@@ -211,7 +215,8 @@ class _ViewDataState extends State<ViewData> {
           "title": _titleController.text,
           "task": type,
           "category": category,
-          "description": _descriptionController.text
+          "description": _descriptionController.text,
+          "time": _timeController.text
         });
         Navigator.pop(context);
       },
@@ -327,6 +332,27 @@ class _ViewDataState extends State<ViewData> {
         fontSize: 22,
         fontWeight: FontWeight.w500,
         color: Colors.black,
+      ),
+    );
+  }
+
+  Widget time() {
+    return Container(
+      height: 55,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+          color: Colors.white60, borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0, right: 10),
+        child: TextFormField(
+          enabled: edit,
+          controller: _timeController,
+          style: GoogleFonts.arvo(color: Colors.black, fontSize: 17),
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "Time",
+              hintStyle: GoogleFonts.arvo(color: Colors.black, fontSize: 17)),
+        ),
       ),
     );
   }

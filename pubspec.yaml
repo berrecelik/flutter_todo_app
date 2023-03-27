@@ -40,6 +40,7 @@ dependencies:
   google_fonts: ^4.0.3
   cloud_firestore: ^4.4.5
   firebase_messaging_platform_interface: ^4.2.16
+  image_picker: ^0.8.7
 
 dev_dependencies:
   flutter_test:

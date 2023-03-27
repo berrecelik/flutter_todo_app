@@ -59,12 +59,29 @@ class _SignInPageState extends State<SignInPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.android, size: 100),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "TO DO APP",
+                  style: GoogleFonts.arvo(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple[800]),
+                ),
+                Icon(Icons.edit_attributes_outlined,
+                    color: Colors.purple[800], size: 50),
+              ],
+            ),
             SizedBox(
               height: 20,
             ),
+            Icon(Icons.android, size: 100),
+            SizedBox(
+              height: 10,
+            ),
             Text(
-              "Hello There!",
+              "Hello there!",
               style:
                   GoogleFonts.arvo(fontSize: 30, fontWeight: FontWeight.bold),
             ),

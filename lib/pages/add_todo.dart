@@ -15,6 +15,7 @@ class _AddToDoPageState extends State<AddToDoPage> {
   final _descriptionController = TextEditingController();
   String type = "";
   String category = "";
+  final _timeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,9 @@ class _AddToDoPageState extends State<AddToDoPage> {
                 height: 25,
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pop(context);
+                },
                 icon: Icon(CupertinoIcons.arrow_left),
                 iconSize: 32,
                 color: Colors.white,
@@ -128,6 +131,14 @@ class _AddToDoPageState extends State<AddToDoPage> {
                     SizedBox(
                       height: 12,
                     ),
+                    label("Time"),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    time(),
+                    SizedBox(
+                      height: 12,
+                    ),
                     button(),
                     SizedBox(
                       height: 30,
@@ -149,7 +160,8 @@ class _AddToDoPageState extends State<AddToDoPage> {
           "title": _titleController.text,
           "task": type,
           "category": category,
-          "description": _descriptionController.text
+          "description": _descriptionController.text,
+          "time": _timeController.text,
         });
         Navigator.pop(context);
       },
@@ -259,6 +271,26 @@ class _AddToDoPageState extends State<AddToDoPage> {
         fontSize: 22,
         fontWeight: FontWeight.w500,
         color: Colors.black,
+      ),
+    );
+  }
+
+  Widget time() {
+    return Container(
+      height: 55,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+          color: Colors.white60, borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0, right: 10),
+        child: TextFormField(
+          controller: _timeController,
+          style: GoogleFonts.arvo(color: Colors.black, fontSize: 17),
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "Time",
+              hintStyle: GoogleFonts.arvo(color: Colors.black, fontSize: 17)),
+        ),
       ),
     );
   }
