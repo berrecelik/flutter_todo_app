@@ -77,14 +77,9 @@ class _ProfileState extends State<Profile> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Signed in as : " + user.email!,
-                    style: GoogleFonts.arvo(color: Colors.white, fontSize: 20),
-                  ),
-                ],
+              child: Text(
+                "Signed in as : " + user.email!,
+                style: GoogleFonts.arvo(color: Colors.white, fontSize: 20),
               ),
             ),
           ]),

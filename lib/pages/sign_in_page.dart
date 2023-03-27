@@ -169,11 +169,6 @@ class _SignInPageState extends State<SignInPage> {
             SizedBox(
               height: 10,
             ),
-            Text("Forgot password?",
-                style: GoogleFonts.arvo(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ))
           ],
         ),
       )),
